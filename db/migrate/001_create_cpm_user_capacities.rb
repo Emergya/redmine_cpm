@@ -1,6 +1,5 @@
-class CreateCpmUsersCapacities < ActiveRecord::Migration
-  def self.up
-    create_table :cpm_users_capacities, :force => true do |t|
+class CreateCpmUser
+    create_table :cpm_user_capacities, :force => true do |t|
       t.column :user_id, :integer, :null => false
       t.column :project_id, :integer, :null => false
       t.column :capacity, :integer, :null => false, :default => 0
@@ -10,6 +9,6 @@ class CreateCpmUsersCapacities < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :cpm_users_capacities
+    drop_table :cpm_user_capacities
   end
 end
