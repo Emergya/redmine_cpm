@@ -1,5 +1,5 @@
-class CreateCpmUserCapacities
-  def self.up        
+class CreateCpmUserCapacities < ActiveRecord::Migration
+  def self.up
     create_table :cpm_user_capacities, :force => true do |t|
       t.column :user_id, :integer, :null => false
       t.column :project_id, :integer, :null => false
