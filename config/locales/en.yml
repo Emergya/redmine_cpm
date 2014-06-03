@@ -37,6 +37,7 @@ en:
     button_assign: "Assign"
 
     label_hide_empty_users: "Hide empty users"
+    label_hide_empty_users: "Hide busy users"
     label_bar_view: "Bar view" 
 
     label_project_manager: "Project manager"
