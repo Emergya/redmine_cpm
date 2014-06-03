@@ -40,6 +40,17 @@ $(document).ready(function(){
 
 		strip_table("capacity_results");
 	});
+	
+	// Click on option "Hide full rows"
+	$(document).on('change','#hide_full_users',function(){
+		if ($(this).is(':checked')){
+			hide_full_results();
+		} else {
+			show_all_results();
+		}
+
+		strip_table("capacity_results");
+	});
 
 	// Click on option "Bar view"
 	$(document).on('change','#bar_view',function(){
@@ -98,6 +109,25 @@ function hide_empty_results(){
 			});
 
 			if (empty){
+				$(row).hide();
+			}
+		}
+	});
+}
+
+// Hide all user rows with all capacities full
+function hide_full_results(){
+		$.each($('#capacity_results tr'),function(i,row){
+		if (i>0){
+			empty = true;
+		
+			$.each($('td',row),function(j,col){
+				if (j>0 && $(col).attr('value')!=0){
+					empty = false;
+				}
+			});
+
+			if (!empty){
 				$(row).hide();
 			}
 		}
