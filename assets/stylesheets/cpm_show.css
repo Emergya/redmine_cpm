@@ -1,10 +1,25 @@
+/* Styling */
+select{
+	width:20%;
+}
+
+input[type=submit]{
+	margin-top:7%;
+}
+
+.viewoptionsdiv{
+	margin-top:3%;
+}
+
+.viewoptionsdiv input[type=checkbox]{
+	margin-right:1.5%;
+}
+
 /* Filters */
 .filter_name{
 	display:inline-table;
 	width:180px;
 }
-
-
 
 /* Table */
 div#content_capacity_results{
@@ -66,7 +81,6 @@ td div.bar_empty{
 .alert{
 	color:red;
 }
-
 
 
 /* Modal */
