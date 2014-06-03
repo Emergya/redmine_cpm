@@ -1,0 +1,57 @@
+/* Left side */
+.userdiv{
+	padding-top:2.5%;
+}
+
+.userdiv div{
+	float:left;
+	width:12%;
+}
+
+.projectdiv{
+	padding-top:2.5%;
+	clear:both;
+}
+
+.projectdiv div{
+	float:left;
+	width:12%;
+}
+
+.capacitydiv{
+	padding-top:2.5%;
+	clear:both;	
+}
+
+.capacitydiv div{
+	float:left;
+	width:12%;
+}
+
+/* Right side */
+.startdatediv{
+	padding-top:2.5%;
+}
+
+.startdatediv div{
+	float:left;
+	width:12%;
+}
+
+.duedatediv{
+	padding-top:2.5%;
+	clear:both;
+}
+
+.duedatediv div{
+	float:left;
+	width:12%;
+}
+
+.assigndiv{
+	padding-top:2.5%;
+	clear:both;
+	width:12%;
+}
+
+
