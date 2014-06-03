@@ -37,6 +37,7 @@ de:
     button_assign: "Zuweisen"
 
     label_hide_empty_users: "Verstecke leere Benutzer"
+    label_hide_full_users: "Verstecke beschäftigte Benutzer"
     label_bar_view: "Balkenansicht" 
 
     label_project_manager: "Projekt Manager"
