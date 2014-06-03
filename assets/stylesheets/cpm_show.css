@@ -3,8 +3,8 @@ select{
 	width:20%;
 }
 
-input[type=submit]{
-	margin-top:7%;
+.viewoptionsdiv input[type=submit]{
+	margin-left:20%;
 }
 
 .viewoptionsdiv{
@@ -13,6 +13,10 @@ input[type=submit]{
 
 .viewoptionsdiv input[type=checkbox]{
 	margin-right:1.5%;
+}
+
+h3{
+	margin-top:2%;	
 }
 
 /* Filters */
