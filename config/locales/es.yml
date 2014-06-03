@@ -37,6 +37,7 @@ es:
     button_assign: "Asignar"
 
     label_hide_empty_users: "Ocultar usuarios vacios"
+    label_hide_full_users: "Ocultar usuarios trabajios"
     label_bar_view: "Ver barras" 
 
     label_project_manager: "Jefes de proyecto"
