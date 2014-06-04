@@ -49,11 +49,12 @@ $(document).ready(function(){
 	});
 	
 	// Click on option "Hide full rows"
-	$(document).on('change','#hide_full_users',function(){
-		if ($(this).is(':checked')){
-			hide_full_results();
-		} else {
+	$('#hide_full_users').change(function(){
+		hide_value = $(this).val();
+		if (hide_value == "0"){
 			show_all_results();
+		} else {
+			hide_full_results(hide_value);
 		}
 
 		strip_table("capacity_results");
@@ -123,21 +124,16 @@ function hide_empty_results(){
 }
 
 // Hide all user rows with all capacities full
-function hide_full_results(){
-		$.each($('#capacity_results tr'),function(i,row){
-		if (i>0){
-			empty = true;
-		
-			$.each($('td',row),function(j,col){
-				if (j>0 && $(col).attr('value')!=0){
-					empty = false;
+function hide_full_results(hide_value){
+	$.each($('#capacity_results tr'),function(i,row){	
+		$(row).show();
+		$.each($('td',row),function(j,col){
+			if (j>0 && $(col).attr('value')!=0){
+				if ($(col).attr('value') >= parseInt(hide_value)){
+					$(row).hide();
 				}
-			});
-
-			if (!empty){
-				$(row).hide();
 			}
-		}
+		});
 	});
 }
 
