@@ -1,197 +1,245 @@
-class CpmManagementController < ApplicationController
-  unloadable
+$(document).ready(function(){
+	add_filter('users');
 
-  before_filter :authorize_global
-  before_filter :set_menu_item
+	// Multiple select for filters
+	$('option').mousedown(function(e) {
+    	e.preventDefault();
+    	$(this).prop('selected', !$(this).prop('selected'));
+    return false;
+	});
+	
+	$(document).tooltip();
+	// Load new filter
+	$('#select_filter').change(function(){
+		select_value = $(this).val();
+		html = "";
 
-  helper :cpm_management
+		add_filter(select_value);
+	});
 
-  # Main page for capacities search and management
-  def show
-    project_filters = Setting.plugin_redmine_cpm['project_filters'] || [0]
-    custom_field_filters = CustomField.where("id IN (?)",project_filters.map{|e| e.to_s}).collect{|cf| [cf.name,cf.id.to_s]}
-    @filters = [['','default']] + custom_field_filters + ['users','groups','projects','project_manager','time_unit','time_unit_num'].collect{|f| [l(:"cpm.label_#{f}"),f]}
-  end
+	// Enable/Disable filters
+	$(document).on('click','.enable_filter',function(){
+		id = $(this)[0].id
 
-  # Form for add capacities to users
-  def assignments
-    # load users options
-    ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
-    @users_for_selection = User.where("id NOT IN (?)", ignored_users).sort_by{|u| u.login}.collect{|u| [u.login,u.id]}
+		if ($(this).is(':checked')){
+			$('.'+id).prop('disabled',false);
+			$('.'+id).show();
+		} else {
+			$('.'+id).prop('disabled',true);
+			$('.'+id).hide();		
+		}
+	});
 
-    # load pojects options
-    @projects_for_selection = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| [p.name,p.id]}
+	// Show capacities search result
+	$('#find_capacities').on('ajax:success', function(data, status, xhr){
+		$('#capacity_modal').html(status);
+		apply_options();
+		clear_disabled_filters();
+	});
 
-    @cpm_user_capacity = CpmUserCapacity.new
-  end
+	// Click on option "Hide empty rows"
+	$(document).on('change','#hide_empty_users',function(){
+		if ($(this).is(':checked')){
+			hide_empty_results();
+		} else {
+			show_all_results();
+		}
 
-  # Capacity search result
-  def planning
-    @users = []
-    @projects = []
+		strip_table("capacity_results");
+	});
+	
+	// Click on option "Hide full rows"
+	$(document).on('change','#hide_full_users',function(){
+		if ($(this).is(':checked')){
+			hide_full_results();
+		} else {
+			show_all_results();
+		}
 
-    # add projects specified by project filter
-    if params[:projects].present?
-      @projects += params[:projects]
-    end
+		strip_table("capacity_results");
+	});
 
-    if params[:project_manager].present?
-      @projects += MemberRole.find(:all, :include => :member, :conditions => ['members.user_id IN (?) AND role_id = ?', params[:project_manager].join(','), 3]).collect{|mr| mr.member.project_id}
-    end
+	// Click on option "Bar view"
+	$(document).on('change','#bar_view',function(){
+		if ($(this).is(':checked')){
+			view_bars();
+		} else {
+			view_numbers();
+		}
+	});
 
-    @projects = @projects.uniq
+	// Update user capacity edition
+	$(document).on('ajax:success', '.edit_cpm_user_capacity', function(data, status, xhr){
+//		msg = status.getResponseHeader('X-Message');
+//		msg = "mensaje";
+		$('#dialog').html(status);
+	});
 
-    # filter projects if custom field filters are specified
-    if params[:custom_field].present?
-      filtered_projects = []
+	$(document).on('ajax:success', '.new_cpm_user_capacity', function(data, status, xhr){
+		$('#dialog').html(status);
+	});
 
-      # if there are no projects specified and there are field filters specified, get all not ignored projects by default
-      if @projects.empty?
-        @projects = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| p.id}
-      end
-      
-      @projects.each do |p|
-        filter = false
-        params[:custom_field].each do |cf,v|
-          if !filter
-            filter = CustomValue.where("customized_type = ? AND customized_id = ? AND custom_field_id = ? AND value IN (?)","Project",p,cf,v.map{|e| e.to_s}) == []
-          end
-        end
-        if !filter
-          filtered_projects << p
-        end
-      end
+});
 
-      @projects = filtered_projects
-    end
+// Show the specified filter
+function add_filter(filter_name){
+	if ($.isNumeric(filter_name)){
+		url = "custom_field/"+filter_name;
+	} else {
+		url = filter_name
+	}
 
-    # add users specified by users filter
-    if params[:users].present?
-      @users += User.where("id IN (?)", params[:users])
-    end
+	$.ajax({
+		url: '/cpm_management/get_filter_'+url,
+		async: false,
+		success: function(filter){
+			html = filter;
+		}
+	});
 
-    # add users specified by groups filter
-    if params[:groups].present?
-      @users += Group.where("id IN (?)", params[:groups]).collect{|g| g.users}.flatten
-    end
+	$('#active_filters').append("<div id='"+filter_name+"' class='filter'><input id='filter_"+filter_name+"' class='enable_filter' type='checkbox' checked /> "+html+"</div>");
+	
+	$('option[value='+filter_name+']').prop('disabled',true);
+	$('#select_filter').val("default");
+}
 
-    # join users
-    @users = @users.uniq.sort_by{|u| u.login}
+// Hide all user rows with all capacities empty
+function hide_empty_results(){
+	$.each($('#capacity_results tr'),function(i,row){
+		if (i>0){
+			empty = true;
+		
+			$.each($('td',row),function(j,col){
+				if (j>0 && $(col).attr('value')!=0){
+					empty = false;
+				}
+			});
 
-    # get users specified by project if there are not using filter for users or groups
-    if !@projects.blank? && @users.blank?
-      projects = Project.where("id IN ("+@projects.join(',')+")")
+			if (empty){
+				$(row).hide();
+			}
+		}
+	});
+}
 
-      members = projects.collect{|p| p.members.collect{|m| m.user_id}}.flatten
-      time_entries = projects.collect{|p| p.time_entries.collect{|te| te.user_id}}.flatten
+// Hide all user rows with all capacities full
+function hide_full_results(){
+		$.each($('#capacity_results tr'),function(i,row){
+		if (i>0){
+			empty = true;
+		
+			$.each($('td',row),function(j,col){
+				if (j>0 && $(col).attr('value')!=0){
+					empty = false;
+				}
+			});
 
-      @users = User.where("id IN (?)", (members+time_entries).uniq).sort_by{|u| u.login}
-    end
+			if (!empty){
+				$(row).hide();
+			}
+		}
+	});
+}
 
-    @time_unit = params[:time_unit] || 'week'
+// Show all user rows
+function show_all_results(){
+	$.each($('#capacity_results tr'),function(i,row){
+		$(row).show();
+	});
+}
 
-    if params[:time_unit_num].present?
-      @time_unit_num = params[:time_unit_num].to_i
-    else
-      @time_unit_num = 12
-    end
+// Añade alternativamente las clases odd y even a las filas de la tabla indicada
+function strip_table(table_id){
+	nxt = 'odd';
+	$('#'+table_id+' tbody tr').each(function(i,tr){
+		if (i>0 && $(tr).is(':visible')){
+			$(this).removeClass('even').removeClass('odd');
+			$(this).addClass(nxt);
 
-    render layout: false
-  end
+			if (nxt=='odd'){
+				nxt = 'even';
+			} else {
+				nxt = 'odd';
+			}
+		}
+	});
+}
 
-  # Capacity edit form
-  def edit_form
-    user = User.find_by_id(params[:user_id])
-    projects = params[:projects]
-    
-    @from_date = Date.strptime(params[:from_date], "%d/%m/%y")
-    @to_date = Date.strptime(params[:to_date], "%d/%m/%y")
+// Change capacity view mode to bars
+function view_bars(){
+	$.each($('#capacity_results tr'),function(i,row){
+		if (i>0){
+			$.each($('td',row),function(j,col){
+				if (j>0){
+					value = $(col).attr('value');
+					fill_bar = parseInt(value/2);
+					empty_bar = 50-fill_bar;
+					$(col).html("<div class='bar_background'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")
+				}
+			});
+		}
+	});
+}
 
-    # load pojects options
-    @projects_for_selection = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| [p.name,p.id]}
-    
-    if projects.present?
-      @default_project = projects[0]
-    else
-      @default_project = nil
-    end
+// Change capacity view mode to numbers
+function view_numbers(){
+	$.each($('#capacity_results tr'),function(i,row){
+		if (i>0){
+			$.each($('td',row),function(j,col){
+				if (j>0){
+					value = $(col).attr('value');
+					$(col).html(value)
+				}
+			});
+		}
+	});
+}
 
-    @capacities = user.get_range_capacities(@from_date,@to_date,projects)
-    #user.cpm_user_capacity.where('to_date >= ?', Date.today)
+// Apply actual visualization options to the result table
+function apply_options(){
+	if ($('#bar_view').is(':checked')){
+		view_bars();
+	} else {
+		view_numbers();
+	}
 
-    @cpm_user_capacity = CpmUserCapacity.new
-    @cpm_user_capacity.user_id = params[:user_id]
+	if ($('#hide_empty_users').is(':checked')){
+		hide_empty_results();
+	} else {
+		show_all_results();
+	}
 
-    render layout: false
-  end
+	strip_table("capacity_results");
+}
 
-# Search filters
-  def get_filter_users
-    # load users options
-    ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
-    options = User.where("id NOT IN (?)", ignored_users).sort_by{|u| u.login}.collect{|u| "<option value='"+(u.id).to_s+"'>"+u.login+"</option>"}
+// Remove disabled filters
+function clear_disabled_filters(){
+	$.each($('.filter'),function(index,filter){
+		if (!$('input.enable_filter',filter).is(':checked')){
+			$('option[value='+filter.id+']').prop('disabled',false);
+			$(filter).remove();
+		}
+	});
+}
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_users")+"</span> <select name='users[]' class='filter_users' size=10 multiple>"+options.join('')+"</select>"
-  end
+// Generate and show modal window for user capacity edition
+function edit_capacities(id,from_date,to_date,projects){
+	html = "";
 
-  def get_filter_groups
-    # load users options
-    ignored_groups = Setting.plugin_redmine_cpm['ignored_groups'] || [0]
-    options = Group.where("id NOT IN (?)", ignored_groups).sort_by{|g| g.name}.collect{|g| "<option value='"+(g.id).to_s+"'>"+g.name+"</option>"}
+	$.ajax({
+		url: '/cpm_management/edit_form/'+id,
+		async: false,
+		data: {projects: projects, from_date: from_date, to_date: to_date},
+		type: 'POST',
+		success: function(filter){
+			html = filter;
+		}
+	});
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_groups")+"</span> <select name='groups[]' class='filter_groups' size=10 multiple>"+options.join('')+"</select>"
-  end
+	$('#dialog').html(html);
+	$('#dialog').dialog({width:830, modal:true, close: function(){ 
+		$('.ui-dialog').remove();
+		$('#find_capacities').submit();
+	} });
 
-  def get_filter_projects
-    # load projects options
-    options = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| "<option value='"+(p.id).to_s+"'>"+CGI::escapeHTML(p.name)+"</option>"}
-
-    render text: "<span class='filter_name'>"+l(:"cpm.label_projects")+"</span> <select name='projects[]' class='filter_projects' size=10 multiple>"+options.join('')+"</select>"
-  end
-
-  def get_filter_project_manager
-    project_manager_role = Setting.plugin_redmine_cpm['project_manager_role'];
-
-    role_pm = Role.find_by_id(project_manager_role)
-
-    users = []
-    Project.all.collect{|p|
-      project_manager = p.users_by_role[role_pm]
-      if project_manager.present?
-        project_manager.each do |pm|
-          users << pm
-        end
-      end
-    }
-
-    options = users.uniq.sort.collect{|u| "<option value='"+(u.id).to_s+"'>"+u.login+"</option>"}
-
-    render text: "<span class='filter_name'>"+l(:"cpm.label_project_manager")+"</span> <select name='project_manager[]' class='filter_projects' size=10 multiple>"+options.join('')+"</select>"
-  end
-
-  def get_filter_custom_field
-    custom_field = CustomField.find_by_id(params[:custom_field_id])
-
-    case custom_field.field_format
-      when 'list'
-        options = custom_field.possible_values.collect{|o| "<option value='"+o+"'>"+o+"</option>"}
-        size = [10,options.count].min
-        render text: "<span class='filter_name'>"+custom_field.name+"</span> <select name='custom_field["+params[:custom_field_id].to_s+"][]' class='filter_"+custom_field.id.to_s+"' size="+size.to_s+" multiple>"+options.join('')+"</select>"
-    end
-  end
-
-  def get_filter_time_unit
-    options = "<option value='day'>"+l(:"cpm.label_day")+"</option><option value='week'>"+l(:"cpm.label_week")+"</option><option value='month'>"+l(:"cpm.label_month")+"</option>"
-
-    render text: "<span class='filter_name'>"+l(:"cpm.label_time_unit")+"</span> <select name='time_unit' class='filter_time_unit'>"+options+"</select>";
-  end
-
-  def get_filter_time_unit_num
-    render text: "<span class='filter_name'>"+l(:"cpm.label_time_unit_num")+"</span> <input name='time_unit_num' type='text' value='12' class='filter_time_unit_num' />"
-  end
-
-  private
-  def set_menu_item
-    self.class.menu_item params['action'].to_sym
-  end
-end
+}
