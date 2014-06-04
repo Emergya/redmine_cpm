@@ -18,6 +18,7 @@ es:
     title_roles: "Roles"
     label_project_manager_role: "Jefe de proyecto"
 
+    label_new_assigment: "Nueva asignación"
     label_assignments: "Asignaciones"
     label_management: "Gestión"
 
