@@ -11,9 +11,9 @@
 	</div>
 <div style="clear: both;"></div>
 <div class="viewoptionsdiv">
+	<%=l(:"cpm.label_bar_view") %><input id="bar_view" type="checkbox" />
 	<%=l(:"cpm.label_hide_empty_users") %><input id="hide_empty_users" type="checkbox" />
 	<%=l(:"cpm.label_hide_full_users")%><%= select_tag(:hide_full_users, options_for_select({" " => "0", "25%" => "25", "50%" => "50", "75%" => "75", "100%" => "100"})) %>
-	<%=l(:"cpm.label_bar_view") %><input id="bar_view" type="checkbox" />
 	
 	<%= submit_tag l(:"cpm.button_find") %>
 </div>
