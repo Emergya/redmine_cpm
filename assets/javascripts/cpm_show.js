@@ -174,7 +174,11 @@ function view_bars(){
 					value = $(col).attr('value');
 					fill_bar = parseInt(value/2);
 					empty_bar = 50-fill_bar;
-					$(col).html("<div class='bar_background'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")
+					if (value == 100){
+						$(col).html("<div class='bar_background_full'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")	
+					}else{
+						$(col).html("<div class='bar_background'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")
+					}
 				}
 			});
 		}
