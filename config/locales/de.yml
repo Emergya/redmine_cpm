@@ -18,6 +18,7 @@ de:
     title_roles: "Rollen"
     label_project_manager_role: "Projekt Manager"
 
+    label_new_assignment: "Neue Zuweisung"
     label_assignments: "Zuweisung"
     label_management: "Management"
 
