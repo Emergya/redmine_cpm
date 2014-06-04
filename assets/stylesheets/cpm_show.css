@@ -1,10 +1,39 @@
+/* Styling */
+select{
+	width:20%;
+}
+
+#select_filter{
+	width:20%;
+}
+
+.viewoptionsdiv input[type=submit]{
+	margin-left:20%;
+}
+
+.viewoptionsdiv{
+	margin-top:3%;
+}
+
+.viewoptionsdiv input[type=checkbox]{
+	margin-right:1.5%;
+}
+
+#hide_full_users{
+	margin-right:1.5%;
+	width:5%;
+}
+
+
+h3{
+	margin-top:2%;	
+}
+
 /* Filters */
 .filter_name{
 	display:inline-table;
 	width:180px;
 }
-
-
 
 /* Table */
 div#content_capacity_results{
@@ -51,6 +80,20 @@ td div.bar_empty{
 	width:100%;
 }
 
+td div.bar_background_full{
+	background: rgb(229,60,22); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(229,60,22,1) 0%, rgba(207,4,4,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(229,60,22,1)), color-stop(100%,rgba(207,4,4,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(229,60,22,1) 0%, rgba(207,4,4,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(229,60,22,1) 0%, rgba(207,4,4,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(229,60,22,1) 0%, rgba(207,4,4,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom, rgba(229,60,22,1) 0%, rgba(207,4,4,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
+	height:50px;
+	width:100%;
+
+}
+
 #capacity_results tbody tr.odd:hover{
 	background-color:#f6f7f8 !important; 
 }
@@ -66,7 +109,6 @@ td div.bar_empty{
 .alert{
 	color:red;
 }
-
 
 
 /* Modal */

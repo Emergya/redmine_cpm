@@ -18,6 +18,7 @@ es:
     title_roles: "Roles"
     label_project_manager_role: "Jefe de proyecto"
 
+    label_new_assigment: "Nueva asignación"
     label_assignments: "Asignaciones"
     label_management: "Gestión"
 
@@ -37,6 +38,7 @@ es:
     button_assign: "Asignar"
 
     label_hide_empty_users: "Ocultar usuarios vacios"
+    label_hide_full_users: "Ocultar usuarios trabajios desde "
     label_bar_view: "Ver barras" 
 
     label_project_manager: "Jefes de proyecto"

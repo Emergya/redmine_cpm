@@ -1,0 +1,76 @@
+# English strings go here for Rails i18n
+de:
+  field_user: "Benutzer"
+  field_project: "Projekt"
+  field_capacity: "Kapazität"
+  field_from_date: "Startdatum"
+  field_to_date: "Enddatum"
+
+  project_module_cpmplugin: "Management Funktionen"
+  permission_cpm_management: "Menü Ansicht der Managment Funktionen"
+
+  cpm:
+    title_black_lists: "Blacklist"
+    label_ignored_users: "Ignorierte Benutzer"
+    label_ignored_projects: "Ignorierte Projekte"
+    label_ignored_groups: "Ignorierte Gruppen"
+    label_project_filters: "Projekt Filter"
+    title_roles: "Rollen"
+    label_project_manager_role: "Projekt Manager"
+
+    label_new_assignment: "Neue Zuweisung"
+    label_assignments: "Zuweisung"
+    label_management: "Management"
+
+    title_capacity_managment: "Management Funktionen"
+    title_search_filters: "Suchfilter"
+    title_results: "Ergebnisse"
+    title_capacity_assignment: "Kapazitätenzuweisung"
+    label_user: "Benutzer"
+    label_users: "Benutzer"
+    label_group: "Gruppe"
+    label_groups: "Gruppen"
+    label_project: "Projekt"
+    label_projects: "Projekte"
+    label_capacity: "Kapazität"
+    label_start_date: "Startdatum"
+    label_due_date: "Enddatum"
+    button_assign: "Zuweisen"
+
+    label_hide_empty_users: "Verstecke leere Benutzer"
+    label_hide_full_users: "Verstecke beschäftigte Benutzer ab "
+    label_bar_view: "Balkenansicht" 
+
+    label_project_manager: "Projekt Manager"
+    label_time_unit: "Zeiteinheit"
+    label_time_unit_num: "Zeiteinheitsnummer"
+    label_day: "Tag"
+    label_week: "Woche"
+    label_month: "Monat"
+
+    button_find: "Suche"
+    label_week_n: "Woche %{n}"
+    label_month_n: "Monat %{n}"
+
+    msg_capacity_higher_than_100: "Die Kapazität des Benutzers beträgt mehr als 100%"
+    msg_save_success: "Fortschritt speichern"
+    msg_edit_success: "Fortschritt bearbeiten"
+    msg_delete_success: "Fortschritt löschen"
+    months:
+      January: "Januar"
+      February: "Februar"
+      March: "März"
+      April: "April"
+      May: "Mai"
+      June: "Juni"
+      July: "Juli"
+      August: "August"
+      September: "September"
+      October: "Oktober"
+      November: "November"
+      December: "Dezember"
+      
+  activerecord:
+    errors:
+      messages:
+        msg_to_date_after_from_date: Muss später sein als das Startdatum

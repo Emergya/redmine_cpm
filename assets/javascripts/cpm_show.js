@@ -1,6 +1,13 @@
 $(document).ready(function(){
 	add_filter('users');
 
+	// Multiple select for filters
+	$('option').mousedown(function(e) {
+    	e.preventDefault();
+    	$(this).prop('selected', !$(this).prop('selected'));
+    return false;
+	});
+	
 	$(document).tooltip();
 	// Load new filter
 	$('#select_filter').change(function(){
@@ -36,6 +43,18 @@ $(document).ready(function(){
 			hide_empty_results();
 		} else {
 			show_all_results();
+		}
+
+		strip_table("capacity_results");
+	});
+	
+	// Click on option "Hide full rows"
+	$('#hide_full_users').change(function(){
+		hide_value = $(this).val();
+		if (hide_value == "0"){
+			show_all_results();
+		} else {
+			hide_full_results(hide_value);
 		}
 
 		strip_table("capacity_results");
@@ -104,6 +123,20 @@ function hide_empty_results(){
 	});
 }
 
+// Hide all user rows with all capacities full
+function hide_full_results(hide_value){
+	$.each($('#capacity_results tr'),function(i,row){	
+		$(row).show();
+		$.each($('td',row),function(j,col){
+			if (j>0 && $(col).attr('value')!=0){
+				if ($(col).attr('value') >= parseInt(hide_value)){
+					$(row).hide();
+				}
+			}
+		});
+	});
+}
+
 // Show all user rows
 function show_all_results(){
 	$.each($('#capacity_results tr'),function(i,row){
@@ -137,7 +170,11 @@ function view_bars(){
 					value = $(col).attr('value');
 					fill_bar = parseInt(value/2);
 					empty_bar = 50-fill_bar;
-					$(col).html("<div class='bar_background'><div style='height:"+empty_bar+"px;' class='bar_empty'></div></div>")
+					if (value == 100){
+						$(col).html("<div class='bar_background_full'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")	
+					}else{
+						$(col).html("<div class='bar_background'><div style='height:"+empty_bar+"px;' class='bar_empty'>"+value+"</div></div>")
+					}
 				}
 			});
 		}

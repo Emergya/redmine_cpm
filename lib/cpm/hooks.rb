@@ -4,9 +4,9 @@ module CPM
       content = User.current.get_capacity_summary
 
       if content.blank?
-      	content = "No tiene establecida ninguna dedicación para hoy."
+      	content = "No tiene establecida ninguna dedicacion para hoy."
       else
-      	content = "<h3>Dedicación para hoy</h3>".html_safe+content
+      	content = "<h3>Dedicacion para hoy</h3>".html_safe+content
       end
 
  
