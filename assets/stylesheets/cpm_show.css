@@ -3,6 +3,10 @@ select{
 	width:20%;
 }
 
+#select_filter{
+	width:20%;
+}
+
 .viewoptionsdiv input[type=submit]{
 	margin-left:20%;
 }
@@ -14,6 +18,12 @@ select{
 .viewoptionsdiv input[type=checkbox]{
 	margin-right:1.5%;
 }
+
+#hide_full_users{
+	margin-right:1.5%;
+	width:5%;
+}
+
 
 h3{
 	margin-top:2%;	
