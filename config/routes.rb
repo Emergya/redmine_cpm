@@ -1,8 +1,5 @@
 # Plugin's routes
-# See: http://guides.rubyonrails.org/routing.html
 RedmineApp::Application.routes.draw do
-#	resources :cpm_user_capacity
-
 	match '/cpm_management/:action' => 'cpm_management'
 	match '/cpm_user_capacity/:action' => 'cpm_user_capacity'
 	match '/cpm_management/edit_form/:user_id' => 'cpm_management#edit_form'

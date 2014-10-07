@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	add_filter('users');
+	//add_filter('users');
 
 	$(document).tooltip({
 		open: function (event, ui) {
@@ -56,8 +56,6 @@ $(document).ready(function(){
 
 	// Update user capacity edition
 	$(document).on('ajax:success', '.edit_cpm_user_capacity', function(data, status, xhr){
-//		msg = status.getResponseHeader('X-Message');
-//		msg = "mensaje";
 		$('#dialog').html(status);
 	});
 
@@ -68,25 +66,52 @@ $(document).ready(function(){
 });
 
 // Show the specified filter
-function add_filter(filter_name){
+function add_filter(filter_name,show_banned,options){
 	if ($.isNumeric(filter_name)){
 		url = "custom_field/"+filter_name;
 	} else {
 		url = filter_name
 	}
 
+	data = {}
+	if (show_banned == true){
+		data['show_banned_'+filter_name] = show_banned;
+		data[filter_name]=options;
+	} else {
+		data[filter_name]=options;
+	}
+
 	$.ajax({
 		url: '/cpm_management/get_filter_'+url,
+		data: data,
 		async: false,
 		success: function(filter){
 			html = filter;
 		}
 	});
 
-	$('#active_filters').append("<div id='"+filter_name+"' class='filter'><input id='filter_"+filter_name+"' class='enable_filter' type='checkbox' checked /> "+html+"</div>");
+	// Show filter options
+	if ($('#active_filters #'+filter_name).length != 0){
+		$('#active_filters #'+filter_name).append(html['filter'])
+	} else {
+		$('#active_filters').append("<div id='"+filter_name+"' class='filter'>"+html['filter']+"</div>");
+	}
 	
+	// Disable filter option in 'Add filter' list
 	$('option[value='+filter_name+']').prop('disabled',true);
 	$('#select_filter').val("default");
+}
+
+function update_filter(filter_name,show_banned,options){
+	// Delete specified filter
+	$('#'+filter_name).empty();
+
+	options_arr = [];
+	$.each(options, function(i,option){
+		options_arr.push(option['value']);
+	});
+	// Show specified filter
+	add_filter(filter_name,show_banned,options_arr);
 }
 
 // Hide all user rows with all capacities empty
@@ -196,7 +221,7 @@ function edit_capacities(id,from_date,to_date,projects){
 	$.ajax({
 		url: '/cpm_management/edit_form/'+id,
 		async: false,
-		data: {projects: projects, from_date: from_date, to_date: to_date},
+		data: {projects: projects, from_date: from_date, to_date: to_date, ignore_blacklists: $('input[name="ignore_blacklists"]').serialize()},
 		type: 'POST',
 		success: function(filter){
 			html = filter;
@@ -207,7 +232,20 @@ function edit_capacities(id,from_date,to_date,projects){
 	//830
 	$('#dialog').dialog({width:1070, modal:true, close: function(){ 
 		$('.ui-dialog').remove();
+		enable_remote_submit('find_capacities', '/cpm_management/planning');
 		$('#find_capacities').submit();
+		disable_remote_submit('find_capacities', '/cpm_management/show');
 	} });
 
+}
+
+function enable_remote_submit(form_id, action){
+	$('#'+form_id).attr('data-remote','true');
+	$('#'+form_id).attr('action',action);
+}
+
+function disable_remote_submit(form_id, action){
+	$('#'+form_id).attr('action',action);
+	$('#'+form_id).removeAttr('data-remote');
+	$('#'+form_id).removeData("remote");
 }

@@ -22,7 +22,7 @@
 	        :multiple => true,
 	        :size => 10 %>
 		</p>
-	</fielset>
+	</fieldset>
 </div>
 <div class="splitcontentright">
 	<fieldset>
@@ -34,7 +34,7 @@
 	        :multiple => true,
 	        :size => 10 %>
 		</p>
-	</fielset>
+	</fieldset>
 	<fieldset>
 		<legend><%=l(:"cpm.title_roles")%></legend>
 		<p>
@@ -44,6 +44,71 @@
 	        :multiple => true,
 	        :size => 10 %>
 		</p>
-	</fielset>
+	</fieldset>
+	<fieldset>
+		<legend><%=l(:"cpm.title_custom_fields")%></legend>
+		<p>
+	    <label><%=l(:"cpm.label_cmi_profile")%></label>
+	    <%= select_tag 'settings[cmi_profile]',
+	        options_from_collection_for_select(UserCustomField.all, :id, :name, (@settings['cmi_profile'] || [])), 
+	        :include_blank => true
+	    %>
+		</p>
+	</fieldset>
 </div>
 <div style="clear: both;"></div>
+
+<script>
+$(document).ready(function(){
+	// When any black list has been changed, show a confirmation window before submit
+	$("input[name='commit']").click(function(){
+		changes = false;
+		new_usr_bl = $('select#settings_ignored_users').val();
+		act_usr_bl = <%=@settings['ignored_users'].to_json.html_safe%>;
+		new_grp_bl = $('select#settings_ignored_groups').val();
+		act_grp_bl = <%=@settings['ignored_groups'].to_json.html_safe%>;
+		new_prj_bl = $('select#settings_ignored_projects').val();
+		act_prj_bl = <%=@settings['ignored_projects'].to_json.html_safe%>;
+
+		message = "<%=l(:'cpm.label_black_list_changes')%>:\r\n";
+
+		if (!array_equals(new_usr_bl,act_usr_bl)){
+			changes = true;
+			message += "\t- <%=l(:'cpm.label_ignored_users')%>\r\n";
+		}
+		if (!array_equals(new_grp_bl,act_grp_bl)){
+			changes = true;
+			message += "\t- <%=l(:'cpm.label_ignored_groups')%>\r\n";
+		}
+		if (!array_equals(new_prj_bl,act_prj_bl)){
+			changes = true;
+			message += "\t- <%=l(:'cpm.label_ignored_projects')%>\r\n";
+		}
+
+		message += "<%=l(:'cpm.label_save_changes_confirm')%>";
+
+		if (changes){
+			return confirm(message);
+		}
+	});
+});
+
+// Check if two arrays have the same elements
+function array_equals(arr1,arr2){
+	equals = true;
+
+	$.each(arr1,function(i,element){
+		if ($.inArray(element,arr2)<0){
+			equals = false;
+		}
+	});
+
+	$.each(arr2,function(i,element){
+		if ($.inArray(element,arr1)<0){
+			equals = false;
+		}
+	});
+
+	return equals;
+}
+</script>

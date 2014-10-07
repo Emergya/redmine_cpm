@@ -1,0 +1,5 @@
+<div id='time_unit' class='filter'>
+	<input id='filter_time_unit' class='enable_filter' type='checkbox' checked /> 
+	<span class='filter_name'><%=l(:"cpm.label_time_unit")%></span>
+	<%= select_tag 'time_unit', options_for_select(@time_unit_options, selected: @time_unit_selected), class: 'filter_time_unit' %>
+</div>

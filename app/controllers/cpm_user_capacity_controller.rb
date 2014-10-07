@@ -18,16 +18,11 @@ class CpmUserCapacityController < ApplicationController
   # Add new capacity to an user for a project
   def new
     data = params[:cpm_user_capacity]
-#    data[:editor_id] = User.current.id
 
   	@cpm_user_capacity = CpmUserCapacity.new(data)
 
   	if @cpm_user_capacity.save
   		flash[:notice] = l(:"cpm.msg_save_success")  
-
-      if !@cpm_user_capacity.check_capacity
-        flash[:warning] = l(:"cpm.msg_capacity_higher_than_100")
-      end
     else
   		flash[:error] = @cpm_user_capacity.get_error_message
     end
@@ -41,10 +36,6 @@ class CpmUserCapacityController < ApplicationController
 
     if cpm.update_attributes(data)
       flash[:notice] = l(:"cpm.msg_edit_success")
-
-      if !cpm.check_capacity
-        flash[:warning] = l(:"cpm.msg_capacity_higher_than_100")
-      end
     else
       flash[:error] = cpm.get_error_message
     end

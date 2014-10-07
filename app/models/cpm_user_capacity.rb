@@ -58,4 +58,12 @@ class CpmUserCapacity < ActiveRecord::Base
 
     error_msg
   end
+
+  # Array of filter names
+  def self.get_filter_names
+    project_filters = Setting.plugin_redmine_cpm['project_filters'] || [0]
+    custom_field_filters = CustomField.where("id IN (?)",project_filters.map{|e| e.to_s}).collect{|cf| [cf.name,cf.id.to_s]}
+    [['','default']] + custom_field_filters + ['users','groups','projects','project_manager','time_unit','time_unit_num','ignore_black_lists'].collect{|f| [l(:"cpm.label_#{f}"),f]}
+  end
+
 end

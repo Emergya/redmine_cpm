@@ -1,0 +1,11 @@
+<div id='users' class='filter'>
+	<input id='filter_users' class='enable_filter' type='checkbox' checked /> 
+	<span class='filter_name'><%=l(:"cpm.label_users")%></span> 
+	<div class='filter_options'>
+		<%= select_tag 'users[]', options_for_select(@users_options, selected: @users_selected), class: 'filter_users', multiple: true, size: 10 %>
+		<div>
+			<input type='checkbox' class='filter_users show_banned' name='show_banned_users' onclick='update_filter("users",$("#users input.show_banned").is(":checked"),$("#users select.filter_users").serializeArray());' <% if params['show_banned_users'].present? %> checked  <% end %> >
+			<span class='filter_users'><%=l(:"cpm.label_show_banned")%></span>
+		</div>
+	</div>
+</div>

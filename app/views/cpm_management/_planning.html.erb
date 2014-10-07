@@ -1,0 +1,37 @@
+<h3><%=l(:"cpm.title_results")%></h3>
+
+<% if @users.present? %>
+<div id="content_capacity_results">
+	<table id="capacity_results" class="list issues" >
+		<thead>
+			<tr>
+				<th><%=l(:"cpm.label_user")%></th>
+				<% @time_unit_num.times do |i| %>
+					<th class="<%= @time_unit %> <%= 'weekend' if is_friday(@time_unit,i) %>"><%= get_column_name(@time_unit,i) %></th>
+				<% end %>
+			</tr>
+		</thead>
+		<tbody>
+		<% row=0 %>
+		<% @users.each do |user| %>
+			<tr class=<%=even_odd(row)%> >
+				<td class="username_field" title="<%=user.show_tooltip_info%>">
+					<%= link_to user.login, controller: 'users', action: 'edit', id: user.id %>
+				</td>
+				<% @time_unit_num.times do |i| %>
+					<% capacity = user.get_capacity(@time_unit,i,@projects) %>
+					<td onclick="edit_capacities('<%=user.id%>','<%=get_from_date(@time_unit,i)%>','<%=get_to_date(@time_unit,i)%>',<%=@projects.to_json%>);" class="edit_user_capacities <%='alert' if capacity > 100 %> <%=@time_unit%> <%= 'weekend' if is_friday(@time_unit,i) %>" title="<%=user.get_tooltip(@time_unit,i,@projects)%>" value=<%=capacity%>>
+						<%= capacity %>
+					</td>
+				<% end %>
+			</tr>
+			<% row+=1 %>
+		<% end %>
+		</tbody>
+	</table>
+</div>
+<% end %>
+
+
+<div id="dialog">
+</div>

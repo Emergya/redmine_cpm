@@ -1,0 +1,7 @@
+<% id = params[:custom_field_id] || custom_field_id %>
+
+<div id='projects' class='filter'>
+	<input id=<%='filter_'+id%> class='enable_filter' type='checkbox' checked /> 
+	<span class='filter_name'><%=@custom_field_name[id]%></span> 
+	<%= select_tag 'custom_field['+id+'][]', options_for_select(@custom_field_options[id], selected: @custom_field_selected[id]), class: 'filter_'+id, multiple: true, size: @custom_field_size[id] %>
+</div>

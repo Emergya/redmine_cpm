@@ -1,0 +1,5 @@
+<div id='project_manager' class='filter'>
+	<input id='filter_project_manager' class='enable_filter' type='checkbox' checked /> 
+	<span class='filter_name'><%=l(:"cpm.label_project_manager")%></span> 
+	<%= select_tag 'project_manager[]', options_for_select(@project_manager_options, selected: @project_manager_selected), class: 'filter_project_manager', multiple: true, size: 10 %>
+</div>

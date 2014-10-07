@@ -1,0 +1,13 @@
+<%
+content = User.current.get_capacity_summary
+%>
+<div class='box'>
+	<% if content.blank? %>
+      	<%= l(:"cpm.label_no_assignments_today") %>
+	<% else %>
+      	<h3>
+      		<%= l(:"cpm.label_todays_assignments") %>
+      	</h3>
+      	<%= content.html_safe %>
+	<% end %>
+</div>

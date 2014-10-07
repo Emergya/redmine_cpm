@@ -17,6 +17,10 @@ es:
     label_project_filters: "Filtros de proyecto"
     title_roles: "Roles"
     label_project_manager_role: "Jefe de proyecto"
+    title_custom_fields: "Campos personalizados"
+    label_cmi_profile: "Perfiles CMI"
+    label_black_list_changes: "Se han producido cambios en las siguientes listas"
+    label_save_changes_confirm: "¿Está seguro que desea guardar los cambios?"
 
     label_assignments: "Asignaciones"
     label_management: "Gestión"
@@ -35,22 +39,32 @@ es:
     label_capacity: "Capacidad"
     label_start_date: "Inicio"
     label_due_date: "Fin"
+    label_show_banned: "Muestra opciones ocultas"
     button_assign: "Asignar"
 
     label_hide_empty_users: "Ocultar usuarios vacios"
-    label_bar_view: "Ver barras" 
+    label_bar_view: "Ver barras"
 
     label_project_manager: "Jefes de proyecto"
     label_time_unit: "Unidad temporal"
     label_time_unit_num: "Núm. unidades temporales"
+    label_ignore_black_lists: "Ignorar Listas negras"
     label_day: "Día"
     label_week: "Semana"
     label_month: "Mes"
+    label_other_projects: "Y %{n} proyectos más"
+
+    label_no_assignments_today: "No tiene establecida ninguna dedicación para hoy."
+    label_todays_assignments: "Dedicación para hoy"
+    label_no_assignments: "No se han establecido asignaciones"
+
+    label_allocation: "Dedicación"
 
     button_find: "Buscar"
     label_week_n: "Semana %{n}"
     label_month_n: "Mes %{n}"
 
+    msg_projects_not_found: "No se ha encontrado ningún proyecto con los requisitos especificados. Se mostrarán los resultados para todos los proyectos."
     msg_capacity_higher_than_100: "La capacidad del usuario a superado el 100%"
     msg_save_success: "Se ha guardado con exito"
     msg_edit_success: "Se ha modificado con exito"

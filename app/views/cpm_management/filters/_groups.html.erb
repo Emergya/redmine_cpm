@@ -1,0 +1,11 @@
+<div id='groups' class='filter'>
+	<input id='filter_groups' class='enable_filter' type='checkbox' checked /> 
+	<span class='filter_name'><%=l(:"cpm.label_groups")%></span> 
+	<div class='filter_options'>
+		<%= select_tag 'groups[]', options_for_select(@groups_options, selected: @groups_selected), class: 'filter_groups', multiple: true, size: 10 %>
+		<div>
+			<input type='checkbox' class='filter_groups show_banned' name='show_banned_groups' onclick='update_filter("groups",$("#groups input.show_banned").is(":checked"),$("#groups select.filter_groups").serializeArray());' <% if params['show_banned_groups']=='true' %> checked  <% end %> >
+			<span class='filter_groups'><%=l(:"cpm.label_show_banned")%></span>
+		</div>
+	</div>
+</div>

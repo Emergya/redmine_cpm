@@ -39,7 +39,7 @@ module CPM
     end
 
     def self.is_weekend(day)
-      result = (date.to_i == 6 || date.to_i == 0)
+      result = (day.to_i == 6 || day.to_i == 0)
     end
   end
 end

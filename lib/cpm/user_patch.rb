@@ -44,13 +44,14 @@ module CPM
         if projects_id.present?
           query = "from_date <= ? AND to_date >= ? AND project_id IN ("+projects_id.join(',')+")"
         else
-          query = "from_date <= ? AND to_date >= ?"
+          ignored_projects = Setting.plugin_redmine_cpm['ignored_projects'] || [0]
+          query = "from_date <= ? AND to_date >= ? AND project_id NOT IN ("+ignored_projects.join(',')+")"
         end
 
         self.cpm_capacities.where(query, due_date+1, start_date)
       end
 
-      # Show tooltip message for the user row
+      # Show user capacity tooltip
       def get_tooltip(type,i,projects)
         start_day = CpmDate.get_start_date(type,i)
         end_day = CpmDate.get_due_date(type,i)
@@ -65,6 +66,39 @@ module CPM
         }.join("<br>")
       end
 
+      # Show user tooltip
+      def show_tooltip_info
+        profile_id = Setting.plugin_redmine_cpm['cmi_profile'] || []
+
+        info = self.name
+
+        if profile_id.present?
+          profile = self.custom_values.where("custom_field_id = ?", profile_id)
+          if profile.present?
+            info += " ("+profile[0].value+")"
+          end
+        end
+
+        projects = self.projects
+
+        if projects.present?
+          info += "<br><br><b>"+l('label_project_plural')+":</b><ul>"
+          if projects.length > 5
+            4.times do |i|
+              info += "<li>"+projects[i].name+"</li>"
+            end
+            info += "</ul>"+l('cpm.label_other_projects', :n => (projects.length-4).to_s);
+          else projects.length <= 5
+            (projects.length).times do |i|
+              info += "<li>"+projects[i].name+"</li>"
+            end
+            info += "</ul>"
+          end
+        end
+
+        info
+      end
+
       # Get html capacity summary for user's welcome page
       def get_capacity_summary
         today = Date.today
@@ -75,7 +109,7 @@ module CPM
         if capacities.any?
           summary += "<ul>"
           capacities.each do |c|
-            summary += "<li><a href='projects/"+c.project.identifier+"'>"+c.project.name+"</a> - "+(c.capacity).to_s+"%</li>"
+            summary += "<li><a href='projects/"+c.project.identifier+"'>"+CGI::escapeHTML(c.project.name)+"</a> - "+(c.capacity).to_s+"%</li>"
           end
           summary += "</ul>"
         end

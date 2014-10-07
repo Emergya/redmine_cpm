@@ -17,6 +17,10 @@ en:
     label_project_filters: "Project filters"
     title_roles: "Roles"
     label_project_manager_role: "Project manager"
+    title_custom_fields: "Campos personalizados"
+    label_cmi_profile: "Perfiles CMI"
+    label_black_list_changes: "The following lists has been modified"
+    label_save_changes_confirm: "Are you sure you want to save changes?"
 
     label_assignments: "Assignments"
     label_management: "Management"
@@ -35,22 +39,32 @@ en:
     label_capacity: "Capacity"
     label_start_date: "Start date"
     label_due_date: "Due date"
+    label_show_banned: "Show banned options"
     button_assign: "Assign"
 
     label_hide_empty_users: "Hide empty users"
-    label_bar_view: "Bar view" 
+    label_bar_view: "Bar view"
 
     label_project_manager: "Project manager"
     label_time_unit: "Time unit"
     label_time_unit_num: "Time unit num"
+    label_ignore_black_lists: "Ignore Black lists"
     label_day: "Day"
     label_week: "Week"
     label_month: "Month"
+    label_other_projects: "And %{n} others"
+
+    label_no_assignments_today: "No tiene establecida ninguna dedicación para hoy."
+    label_todays_assignments: "Dedicación para hoy"
+    label_no_assignments: "There are no assignments"
+
+    label_allocation: "Allocation"
 
     button_find: "Search"
     label_week_n: "Week %{n}"
     label_month_n: "Month %{n}"
 
+    msg_projects_not_found: "Could not found any project. Results will be shown for all projects."
     msg_capacity_higher_than_100: "The user's capacity is higher than 100%"
     msg_save_success: "Save success"
     msg_edit_success: "Edit success"

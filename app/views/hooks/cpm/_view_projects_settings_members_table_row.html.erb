@@ -1,0 +1,27 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag "cpm_settings_members.css", :plugin => 'redmine_cpm' %>
+<% end %>
+<%
+capacities = member.user.cpm_capacities.where('project_id = ? AND to_date >= ?', @project, Date.today)
+%>
+
+<td>
+  <% if capacities.empty? %>
+    <%= l(:"cpm.label_no_assignments") %>
+  <% else %>
+    <table class='assignments'>
+      <tr>
+        <th><%= l(:'field_capacity')%></th>
+        <th><%= l(:'field_from_date')%></th>
+        <th><%= l(:'field_to_date')%></th>
+      </tr>
+      <% capacities.each do |capacity| %>
+        <tr>
+          <td><%=capacity.capacity%>%</td>
+          <td><%=capacity.from_date.strftime('%d/%m/%Y')%></td>
+          <td><%=capacity.to_date.strftime('%d/%m/%Y')%></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+</td>

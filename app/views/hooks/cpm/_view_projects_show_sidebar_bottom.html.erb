@@ -1,0 +1,4 @@
+<%- if User.current.allowed_to? :manage_members, @project -%>
+    <%= link_to l(:"cpm.label_allocation"), {:controller => 'cpm_management', :action => 'show', 'projects[]' => @project.id, 'time_unit' => 'month'} %>
+  </p>
+<%- end -%>

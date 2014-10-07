@@ -1,9 +1,24 @@
 /* Filters */
 .filter_name{
 	display:inline-table;
-	width:180px;
+	width:140px;
 }
 
+#active_filters select{
+	max-width:220px;
+}
+
+.filter_options{
+	display:inline-table;
+}
+
+.filter{
+	margin-bottom:15px;
+}
+
+#submit_filters{
+	margin-bottom:15px;
+}
 
 
 /* Table */
@@ -12,42 +27,21 @@ div#content_capacity_results{
 }
 
 td div.bar_background{
-	background: rgb(255,168,76); /* Old browsers */
-	background: -moz-linear-gradient(top, rgba(255,168,76,1) 0%, rgba(255,123,13,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,168,76,1)), color-stop(100%,rgba(255,123,13,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, rgba(255,168,76,1) 0%,rgba(255,123,13,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, rgba(255,168,76,1) 0%,rgba(255,123,13,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, rgba(255,168,76,1) 0%,rgba(255,123,13,1) 100%); /* IE10+ */
-	background: linear-gradient(to bottom, rgba(255,168,76,1) 0%,rgba(255,123,13,1) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
+	background: #ffc060;
 	height:50px;
 	width:100%;
 
 }
 
 td.alert div.bar_background{
-	background: #ff3019; /* Old browsers */
-	background: -moz-linear-gradient(top, #ff3019 0%, #cf0404 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff3019), color-stop(100%,#cf0404)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #ff3019 0%,#cf0404 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #ff3019 0%,#cf0404 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #ff3019 0%,#cf0404 100%); /* IE10+ */
-	background: linear-gradient(to bottom, #ff3019 0%,#cf0404 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff3019', endColorstr='#cf0404',GradientType=0 ); /* IE6-9 */
+	background: #ff5040;
 	height:50px;
 	width:100%;
 
 }
 
 td div.bar_empty{
-	background: #cfe7fa; /* Old browsers */
-	background: -moz-linear-gradient(top, #cfe7fa 0%, #6393c1 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cfe7fa), color-stop(100%,#6393c1)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #cfe7fa 0%,#6393c1 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #cfe7fa 0%,#6393c1 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #cfe7fa 0%,#6393c1 100%); /* IE10+ */
-	background: linear-gradient(to bottom, #cfe7fa 0%,#6393c1 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfe7fa', endColorstr='#6393c1',GradientType=0 ); /* IE6-9 */
+	background: #cecefe;
 	width:100%;
 }
 
@@ -67,6 +61,17 @@ td div.bar_empty{
 	color:red;
 }
 
+#capacity_results th.day.weekend, #capacity_results td.day.weekend{
+	border-right:3px dashed #66ff66;
+}
+
+#capacity_results td{
+	padding:2px;
+}
+
+#capacity_results th.month{
+	min-width:130px;
+}
 
 
 /* Modal */

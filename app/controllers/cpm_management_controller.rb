@@ -8,36 +8,54 @@
 
   # Main page for capacities search and management
   def show
-    project_filters = Setting.plugin_redmine_cpm['project_filters'] || [0]
-    custom_field_filters = CustomField.where("id IN (?)",project_filters.map{|e| e.to_s}).collect{|cf| [cf.name,cf.id.to_s]}
-    @filters = [['','default']] + custom_field_filters + ['users','groups','projects','project_manager','time_unit','time_unit_num'].collect{|f| [l(:"cpm.label_#{f}"),f]}
-  end
+    # get all filter names
+    @filters = CpmUserCapacity.get_filter_names
+    
+    # get all filters activated by params
+    @active_filters = []
+    @active_custom_field_filters = []
+    @filters.collect{|f| f[1]}.each do |filter|
+      if params[filter].present?
+        @active_filters << filter
+      elsif params['custom_field'].present? and params['custom_field'].include?(filter)
+        @active_custom_field_filters << filter
+      end
+    end
 
-  # Form for add capacities to users
-  def assignments
-    # load users options
-    ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
-    @users_for_selection = User.where("id NOT IN (?)", ignored_users).sort_by{|u| u.login}.collect{|u| [u.login,u.id]}
+    # if there are no active filters, show users filter
+    if @active_filters.empty? and @active_custom_field_filters.empty?
+      @active_filters << 'users'
+    end
 
-    # load pojects options
-    @projects_for_selection = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| [p.name,p.id]}
+    # for each activated filter, load it
+    @active_filters.each do |active_filter|
+      eval("get_filter_"+active_filter)
+    end
 
-    @cpm_user_capacity = CpmUserCapacity.new
+    @active_custom_field_filters.each do |active_custom_field_filter|
+      get_filter_custom_field(active_custom_field_filter)
+    end
+
+    # process planning table
+    planning
   end
 
   # Capacity search result
   def planning
-    ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
-    ignored_projects = Setting.plugin_redmine_cpm['ignored_projects'] || [0]
+    # set black list arrays to empty if 'ignore_black_lists' filter is activated
+    if !params['filter_ignore_black_lists'].present?
+      ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
+      ignored_projects = Setting.plugin_redmine_cpm['ignored_projects'] || [0]
+    else
+      ignored_users = [0]
+      ignored_projects =[0]
+    end
+
+    # users and projects to show in planning table
     @users = []
     @projects = []
 
-# getting @projects array
-    # add projects specified by project filter
-    if params[:projects].present?
-      @projects += params[:projects]
-    end
-
+    # getting @projects array
     # add projects specified by project manager filter
     if params[:project_manager].present?
       project_manager_role = Setting.plugin_redmine_cpm['project_manager_role'];
@@ -46,18 +64,16 @@
       end
     end
 
-    # excluding ignored projects
+    # exclude ignored projects
     @projects = @projects.uniq.reject{|p| ignored_projects.include?(p.to_s)}
 
-
-# filtering @projects array by custom field filters
     # filter projects if custom field filters are specified
     if params[:custom_field].present?
       filtered_projects = []
 
       # if there are no projects specified and there are field filters specified, get all not ignored projects by default
       if @projects.empty?
-        @projects = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| p.id}
+        @projects = Project.where("id NOT IN (?)", ignored_projects).sort_by{|p| p.name}.collect{|p| p.id}
       end
       
       # for each project available will check if match with all custom field filters activated
@@ -65,7 +81,7 @@
         filter = false
         params[:custom_field].each do |cf,v|
           if !filter
-            filter = CustomValue.where("customized_type = ? AND customized_id = ? AND custom_field_id = ? AND value IN (?)","Project",p,cf,v.map{|e| e.to_s}) == []
+            filter = CustomValue.where("customized_type = ? AND customized_id = ? AND custom_field_id = ? AND value IN (?)","Project",p,cf,v.map{|e| e}) == []
           end
         end
         if !filter
@@ -76,7 +92,18 @@
       @projects = filtered_projects
     end
 
-# getting @users array
+    # add projects specified by project filter
+    if params[:projects].present?
+      @projects += params[:projects]
+    end
+
+    # if there are no projects specified and there are field filters specified, get all not ignored projects by default
+    if @projects.empty?
+      flash.now[:warning] = l(:'cpm.msg_projects_not_found')
+      @projects = Project.where("id NOT IN (?)", ignored_projects).sort_by{|p| p.name}.collect{|p| p.id}
+    end
+
+    # getting @users array
     # add users specified by users filter
     if params[:users].present?
       @users += User.where("id IN (?)", params[:users])
@@ -87,11 +114,10 @@
       @users += Group.where("id IN (?)", params[:groups]).collect{|g| g.users.reject{|u| ignored_users.include?((u.id).to_s)}}.flatten
     end
 
-    # join users
+    # reorder and unify users
     @users = @users.uniq.sort_by{|u| u.login}
 
-# if @users array is empty, get it based on @projects array
-    # get users specified by project if there are not using filter for users or groups
+    # if there are no users selected, get them based on projects selected
     if !@projects.blank? && @users.blank?
       projects = Project.where("id IN ("+@projects.join(',')+")")
 
@@ -103,19 +129,24 @@
       @users = User.where("id IN (?)", (members+time_entries).uniq).reject{|u| ignored_users.include?((u.id).to_s)}.sort_by{|u| u.login}
     end
 
+    # set time_unit and time_unit_num default values
     @time_unit = params[:time_unit] || 'week'
+    @time_unit_num = (params[:time_unit_num] || 12).to_i
 
-    if params[:time_unit_num].present?
-      @time_unit_num = params[:time_unit_num].to_i
-    else
-      @time_unit_num = 12
+    if request.xhr?
+      render "cpm_management/_planning" ,layout: false
     end
-
-    render layout: false
   end
 
   # Capacity edit form
   def edit_form
+    # set projects black list array to empty if 'ignore_black_lists' filter is activated
+    if !params['filter_ignore_black_lists'].present?
+      ignored_projects = Setting.plugin_redmine_cpm['ignored_projects'] || [0]
+    else
+      ignored_projects =[0]
+    end
+
     user = User.find_by_id(params[:user_id])
     projects = params[:projects]
     
@@ -123,7 +154,7 @@
     @to_date = Date.strptime(params[:to_date], "%d/%m/%y")
 
     # load pojects options
-    @projects_for_selection = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| [p.name,p.id]}
+    @projects_for_selection = Project.where("id NOT IN (?)", ignored_projects).sort_by{|p| p.name}.collect{|p| [p.name,p.id]}
     
     if projects.present?
       @default_project = projects[0]
@@ -132,7 +163,12 @@
     end
 
     @capacities = user.get_range_capacities(@from_date,@to_date,projects)
-    #user.cpm_user_capacity.where('to_date >= ?', Date.today)
+
+    @capacities.each do |c|
+      if !c.check_capacity
+        flash[:warning] = l(:"cpm.msg_capacity_higher_than_100")
+      end
+    end
 
     @cpm_user_capacity = CpmUserCapacity.new
     @cpm_user_capacity.user_id = params[:user_id]
@@ -142,26 +178,58 @@
 
 # Search filters
   def get_filter_users
-    # load users options
     ignored_users = Setting.plugin_redmine_cpm['ignored_users'] || [0]
-    options = User.where("id NOT IN (?)", ignored_users).sort_by{|u| u.login}.collect{|u| "<option value='"+(u.id).to_s+"'>"+u.login+"</option>"}
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_users")+"</span> <select name='users[]' class='filter_users' size=10 multiple>"+options.join('')+"</select>"
+    if params['show_banned_users'].present?
+      ignored_users = [0]
+    end
+
+    @users_selected = []
+    if params['users'].present?
+      @users_selected = params['users']
+    end
+
+    @users_options = User.where("id NOT IN(?)", ignored_users).sort_by{|u| u.login}.collect{|u| [u.login, (u.id).to_s]}
+
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/users', :layout => false, :locals => { :options => @users_options }) }
+    end
   end
 
   def get_filter_groups
-    # load users options
     ignored_groups = Setting.plugin_redmine_cpm['ignored_groups'] || [0]
-    options = Group.where("id NOT IN (?)", ignored_groups).sort_by{|g| g.name}.collect{|g| "<option value='"+(g.id).to_s+"'>"+g.name+"</option>"}
+    if params['show_banned_groups'].present?
+      ignored_groups = [0]
+    end
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_groups")+"</span> <select name='groups[]' class='filter_groups' size=10 multiple>"+options.join('')+"</select>"
+    @groups_selected = []
+    if params['groups'].present?
+      @groups_selected = params['groups']
+    end
+
+    @groups_options = Group.where("id NOT IN (?)", ignored_groups).sort_by{|g| g.name}.collect{|g| [g.name, (g.id).to_s]}
+    
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/groups', :layout => false, :locals => { :options => @groups_options }) }
+    end
   end
 
   def get_filter_projects
-    # load projects options
-    options = Project.get_not_ignored_projects.sort_by{|p| p.name}.collect{|p| "<option value='"+(p.id).to_s+"'>"+CGI::escapeHTML(p.name)+"</option>"}
+    ignored_projects = Setting.plugin_redmine_cpm['ignored_projects'] || [0]
+    if params['show_banned_projects'].present?
+      ignored_projects = [0]
+    end
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_projects")+"</span> <select name='projects[]' class='filter_projects' size=10 multiple>"+options.join('')+"</select>"
+    @projects_selected = []
+    if params['projects'].present?
+      @projects_selected = params['projects']
+    end
+
+    @projects_options = Project.where("id NOT IN (?)", ignored_projects).sort_by{|p| p.name}.collect{|p| [CGI::escapeHTML(p.name), (p.id).to_s]}
+
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/projects', :layout => false, :locals => { :options => @projects_options }) }
+    end
   end
 
   def get_filter_project_manager
@@ -179,30 +247,62 @@
       end
     }
 
-    options = users.uniq.sort.collect{|u| "<option value='"+(u.id).to_s+"'>"+u.login+"</option>"}
+    @project_manager_selected = []
+    if params['project_manager'].present?
+      @project_manager_selected = params['project_manager']
+    end
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_project_manager")+"</span> <select name='project_manager[]' class='filter_project_manager' size=10 multiple>"+options.join('')+"</select>"
-  end
+    @project_manager_options = users.uniq.sort.collect{|u| [u.login, (u.id).to_s]}
 
-  def get_filter_custom_field
-    custom_field = CustomField.find_by_id(params[:custom_field_id])
-
-    case custom_field.field_format
-      when 'list'
-        options = custom_field.possible_values.collect{|o| "<option value='"+o+"'>"+o+"</option>"}
-        size = [10,options.count].min
-        render text: "<span class='filter_name'>"+custom_field.name+"</span> <select name='custom_field["+params[:custom_field_id].to_s+"][]' class='filter_"+custom_field.id.to_s+"' size="+size.to_s+" multiple>"+options.join('')+"</select>"
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/project_manager', :layout => false, :locals => { :options => @project_manager_options }) }
     end
   end
 
-  def get_filter_time_unit
-    options = "<option value='day'>"+l(:"cpm.label_day")+"</option><option value='week'>"+l(:"cpm.label_week")+"</option><option value='month'>"+l(:"cpm.label_month")+"</option>"
+  def get_filter_custom_field(custom_field_id=nil)
+    custom_field = CustomField.find_by_id(params[:custom_field_id] || custom_field_id)
 
-    render text: "<span class='filter_name'>"+l(:"cpm.label_time_unit")+"</span> <select name='time_unit' class='filter_time_unit'>"+options+"</select>";
+    @custom_field_options ||= {}
+    @custom_field_size ||= {}
+    @custom_field_name ||= {}
+    @custom_field_selected ||= {}
+    case custom_field.field_format
+      when 'list'
+        @custom_field_name[custom_field.id.to_s] = custom_field.name
+        @custom_field_options[custom_field.id.to_s] = custom_field.possible_values.collect{|o| [o, o]}
+        @custom_field_size[custom_field.id.to_s] = ([10,@custom_field_options[custom_field.id.to_s].count].min).to_s
+
+        if params['custom_field'].present?
+          @custom_field_selected[custom_field.id.to_s] = params['custom_field'][custom_field.id.to_s] || []
+        end
+
+        if request.xhr?
+          render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/custom_field_list', :layout => false, :locals => { :id => custom_field.id }) }
+        end
+    end
+
+  end
+
+  def get_filter_time_unit
+    @time_unit_options = ['day','week','month'].collect{|tu| [l(:"cpm.label_#{tu}"), tu]}
+    @time_unit_selected = params['time_unit'] || 'week'
+
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/time_unit', :layout => false )}
+    end
   end
 
   def get_filter_time_unit_num
-    render text: "<span class='filter_name'>"+l(:"cpm.label_time_unit_num")+"</span> <input name='time_unit_num' type='text' value='12' class='filter_time_unit_num' />"
+    @value = params['time_unit_num'] || '12';
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/time_unit_num', :layout => false )}
+    end
+  end
+
+  def get_filter_ignore_black_lists
+    if request.xhr?
+      render :json => { :filter => render_to_string(:partial => 'cpm_management/filters/ignore_black_lists', :layout => false )}
+    end
   end
 
   private
