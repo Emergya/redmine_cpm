@@ -31,9 +31,13 @@ module CPM
         end
       end
 
-      # if there are no active filters, show users filter
+      # if there are no active filters, show default filters
       if active_filters.empty? and active_custom_field_filters.empty?
-        active_filters << 'users'
+        if Setting.plugin_redmine_cpm['default_active_filters']
+          active_filters = Setting.plugin_redmine_cpm['default_active_filters']
+        else
+          active_filters << 'users'
+        end
       end
 
       [active_filters, active_custom_field_filters]
@@ -46,7 +50,7 @@ module CPM
       if filters[:projects].present?
         projects = projects(filters[:projects])
       else
-        projects = Project.allowed(filters['ignore_black_lists'].present?).collect{|p| p.id} #.sort_by{|p| p.name}
+        projects = Project.all.collect{|p| p.id} #.sort_by{|p| p.name}
       end
 
       # add projects specified by project manager filter
@@ -59,7 +63,8 @@ module CPM
         projects = custom_field(filters[:custom_field], projects)
       end
 
-      projects = Project.find(projects).map(&:self_and_descendants).flatten.uniq.sort_by(&:name)
+      # projects = Project.find(projects).map(&:self_and_descendants).flatten.uniq.sort_by(&:name)
+      Project.allowed(filters['ignore_black_lists'].present?, projects).flatten.uniq.sort_by(&:name)
     end
 
     # Return users filtered
@@ -69,7 +74,7 @@ module CPM
       if filters[:users].present?
         users = users(filters[:users])
       else
-        users = User.allowed(filters['ignore_black_lists'].present?).collect{|u| u.id}
+        users = User.all.collect{|u| u.id}
       end
 
       # add users specified by groups filter
@@ -92,13 +97,17 @@ module CPM
         users = (members + time_entries).uniq.map(&:id)
       end
 
-      User.find(users).sort_by(&:login)
+      User.allowed(filters['ignore_black_lists'].present?, users).flatten.uniq.sort_by(&:login)
     end
 
     # Specific filters
 
     def self.projects(projects)
-    	projects
+      if Setting.plugin_redmine_cpm['add_subprojects']
+        Project.find(projects).map(&:self_and_descendants).flatten.uniq.map(&:id)
+      else
+        projects
+      end
     end
 
     def self.users(users)

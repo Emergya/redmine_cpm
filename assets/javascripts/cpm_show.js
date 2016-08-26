@@ -140,8 +140,8 @@ function hide_empty_results(){
 		if (i>0){
 			empty = true;
 		
-			$.each($('td',row),function(j,col){
-				if (j>0 && $(col).attr('value')!=0){
+			$.each($('td.edit_user_capacities',row),function(j,col){
+				if ($(col).attr('value')!=0){
 					empty = false;
 				}
 			});

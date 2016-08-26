@@ -1,6 +1,14 @@
-<h3><%=l(:"cpm.title_results")%></h3>
-
 <% if @users.present? %>
+</br>
+<h2><%=l(:"cpm.title_results")%></h2>
+
+<input id="hide_empty_users" type="checkbox" /><%=l(:"cpm.label_hide_empty_users") %>
+<input id="bar_view" type="checkbox" /><%=l(:"cpm.label_bar_view") %>
+<input id="sort_by_capacity" type="checkbox" /><%=l(:"cpm.label_sort_by_capacity") %>
+<% if Setting.plugin_redmine_cpm['plugin_knowledge_manager'].present? %>
+	<input id="show_knowledges" type="checkbox" /><%=l(:"cpm.label_show_knowledges") %>
+<% end %>
+
 <div id="content_capacity_results">
 	<table id="capacity_results" class="list issues" >
 		<thead>

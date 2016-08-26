@@ -93,6 +93,9 @@ es:
     label_knowledges: Conocimientos
     label_show_all: Ver todos
 
+    label_add_subprojects: Añadir subproyectos
+    label_default_active_filters: Filtros activos por defecto
+
     unknown: "Desconocido"
     months:
       January: "Enero"

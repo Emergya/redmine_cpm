@@ -37,6 +37,23 @@
 			</p>
 		</p>
 	</fieldset>
+	<fieldset>
+		<legend><%=l(:label_project_plural)%></legend>
+		<p>
+		    <%= check_box_tag 'settings[add_subprojects]', true, @settings['add_subprojects'].present? %>
+			<%=l(:"cpm.label_add_subprojects")%>
+		</p>
+	</fieldset>
+	<fieldset>
+		<legend><%=l(:"cpm.title_custom_fields")%></legend>
+		<p>
+	    <label><%=l(:"cpm.label_additional_info")%></label>
+	    <%= select_tag 'settings[cmi_profile]',
+	        options_from_collection_for_select(UserCustomField.all, :id, :name, (@settings['cmi_profile'] || [])), 
+	        :include_blank => true
+	    %>
+		</p>
+	</fieldset>
 </div>
 <div class="splitcontentright">
 	<fieldset>
@@ -45,6 +62,13 @@
 	    <label><%=l(:"cpm.label_project_filters")%></label>
 	    <%= select_tag 'settings[project_filters]',
 	        options_from_collection_for_select(ProjectCustomField.where("field_format = 'list'").sort_by{|cf| cf.name}, :id, :name, (@settings['project_filters'] || [])),
+	        :multiple => true,
+	        :size => 10 %>
+		</p>
+		<p>
+	    <label><%=l(:"cpm.label_default_active_filters")%></label>
+	    <%= select_tag 'settings[default_active_filters]',
+	        options_for_select(CPM::Filters::DEFAULT_FILTERS.map{|f| [l(("cpm.label_"+f).to_sym), f]}, (@settings['default_active_filters'] || [])),
 	        :multiple => true,
 	        :size => 10 %>
 		</p>
@@ -57,16 +81,6 @@
 	        options_from_collection_for_select(Role.all, :id, :name, (@settings['project_manager_role'] || [])),
 	        :multiple => true,
 	        :size => 10 %>
-		</p>
-	</fieldset>
-	<fieldset>
-		<legend><%=l(:"cpm.title_custom_fields")%></legend>
-		<p>
-	    <label><%=l(:"cpm.label_additional_info")%></label>
-	    <%= select_tag 'settings[cmi_profile]',
-	        options_from_collection_for_select(UserCustomField.all, :id, :name, (@settings['cmi_profile'] || [])), 
-	        :include_blank => true
-	    %>
 		</p>
 	</fieldset>
 	<fieldset>

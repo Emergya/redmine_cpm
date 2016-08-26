@@ -29,8 +29,12 @@ module CPM
         end
       end
 
-      def allowed(ignore_blacklist = false)
-        active.where("users.id NOT IN (?)", not_allowed(ignore_blacklist))
+      def allowed(ignore_blacklist = false, user_list = [])
+        if user_list.present?
+          active.where("users.id IN (?) AND users.id NOT IN (?)", user_list, not_allowed(ignore_blacklist))
+        else
+          active.where("users.id NOT IN (?)", not_allowed(ignore_blacklist))
+        end
       end
 
       # Get users who has the specified role in almost any project

@@ -68,7 +68,7 @@
 
     # create object for result table info
     @capacities = {}
-    all_start_day = CPM::CpmDate.get_start_date(@time_unit, 1)
+    all_start_day = CPM::CpmDate.get_start_date(@time_unit, 0)
     all_end_day = CPM::CpmDate.get_due_date(@time_unit, @time_unit_num)
     @users.each do |user|
       @capacities[user.id] = @time_unit_num.times.collect{|i| {'value' => 0.0, 'tooltip' => ""}}

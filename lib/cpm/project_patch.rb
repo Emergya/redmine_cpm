@@ -28,8 +28,12 @@ module CPM
         end
       end
 
-      def allowed(ignore_blacklist = false)
-        active.where("id NOT IN (?)", not_allowed(ignore_blacklist))
+      def allowed(ignore_blacklist = false, project_list = [])
+        if project_list.present?
+          active.where("id IN (?) AND id NOT IN (?)", project_list, not_allowed(ignore_blacklist))
+        else
+          active.where("id NOT IN (?)", not_allowed(ignore_blacklist))
+        end
       end
     end
 

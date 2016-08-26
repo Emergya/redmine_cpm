@@ -33,7 +33,7 @@
 			<span>
 				<%= f.submit l(:"button_edit") %>
 			</span>
-			<%= link_to l(:"button_delete"), { controller: 'cpm_user_capacity', action: 'delete/'+@cpm.id.to_s, start_date: params[:from_date], due_date: params[:to_date], projects:params[:projects] }, data: { confirm: l(:"text_are_you_sure"), method: :delete}, remote:true, class: "icon icon-del" %>
+			<%= link_to l(:"button_delete"), { controller: 'cpm_user_capacity', action: 'delete', id: @cpm.id.to_s, start_date: params[:from_date], due_date: params[:to_date], projects:params[:projects] }, data: { confirm: l(:"text_are_you_sure"), method: :delete}, remote:true, class: "icon icon-del" %>
 		</div>
 	<% end %>
 </div>
