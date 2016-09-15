@@ -84,6 +84,9 @@
         end
       end
     end
+
+    # passing projects as parameter to edit capacity panel
+    @projects_params = @projects.map(&:id)
     
     # if request is called from AJAX, update only 'planning' partial
     if request.xhr?
