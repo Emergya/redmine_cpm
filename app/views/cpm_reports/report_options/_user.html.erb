@@ -1,6 +1,0 @@
-<%= label_tag 'report_options[users]', l(:"cpm.label_select_users") %>
-<% if @report.present? and @report[:options].present? %>
-	<%= select_tag 'report_options[users]', options_for_select(@report_options,@report[:options][:users]), {:multiple => true, :size => 10} %>
-<% else %>
-	<%= select_tag 'report_options[users]', options_for_select(@report_options), {:multiple => true, :size => 10} %>
-<% end %>

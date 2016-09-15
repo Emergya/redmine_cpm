@@ -1,0 +1,36 @@
+<% @result[:data].each do |element_name, capacities| %>
+<br>
+	<h2><%= element_name %></h2>
+
+	<% if capacities.present? %>
+		<table class="list issues">
+			<thead>
+				<tr bgcolor="#EEEEEE">
+					<% @result[:headers].each do |header| %>
+						<th style="width:25%;"><%=l(:"field_#{header}")%></th>
+					<% end %>
+				</tr>
+			</thead>
+			<tbody>
+				<% capacities.each do |related_element, capacity_data| %>
+					<tr border="1">
+						<td rowspan="<%=[capacity_data.length, 1].max%>"><%= related_element %></td>
+						<% capacity_data.each_with_index do |c,i| %>
+							<% if i>0 %>
+								<tr>
+							<% end %>
+							<td><%= c["capacity"] %></td>
+							<td><%= c["from_date"].strftime('%d/%m/%Y') %></td>
+							<td><%= c["to_date"].strftime('%d/%m/%Y') %></td>	
+							<% if i>0 %>
+								</tr>
+							<% end %>
+						<% end %>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+	<% else %>
+		<h3 style="text-align:center;"><%=l(:"cpm.label_no_user_data")%></h3>
+	<% end %>
+<% end %>

@@ -1,0 +1,2 @@
+<span class='filter_name'><%= label_tag 'projects[]', l(:"cpm.label_projects") %></span>
+<div class='filter_options'><%= select_tag 'projects[]', options_for_select(@projects_options, selected: @projects_selected), class: 'filter_projects', multiple: true, size: 10 %></div>

@@ -25,7 +25,7 @@
 		<tbody>
 		<% row=0 %>
 		<% @users.each do |user| %>
-			<tr class=<%=even_odd(row)%> >
+			<tr class="<%= cycle("odd", "even") %>" >
 				<td class="username_field" title="<%=user.show_tooltip_info%>">
 					<%= link_to user.login, controller: 'users', action: 'edit', id: user.id %>
 				</td>

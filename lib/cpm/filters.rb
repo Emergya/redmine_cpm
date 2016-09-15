@@ -93,8 +93,10 @@ module CPM
         members = User.allowed(filters['ignore_black_lists'].present?).joins(:members).where("members.project_id IN (?)", projects)
         # get users who have time entries in projects
         time_entries = User.allowed(filters['ignore_black_lists'].present?).joins('LEFT JOIN time_entries ON time_entries.user_id = users.id').where("time_entries.project_id IN (?)", projects)
+        # get users who have capacity registered in projects
+        capacity = Project.find(projects).map{|p| p.capacities.map(&:user)}.flatten
 
-        users = (members + time_entries).uniq.map(&:id)
+        users = (members + time_entries + capacity).uniq.map(&:id)
       end
 
       User.allowed(filters['ignore_black_lists'].present?, users).flatten.uniq.sort_by(&:login)

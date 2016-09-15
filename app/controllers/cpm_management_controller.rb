@@ -5,8 +5,6 @@
   before_filter :set_menu_item
   before_filter :oauth_authentication, :only => :show, :unless => :oauth_token?
 
-  helper :cpm_management, :cpm_app
-
   def oauth_token?
     !Setting.plugin_redmine_cpm[:google_calendar].present? or session[:oauth_token].present?
   end

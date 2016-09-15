@@ -1,22 +1,17 @@
 <% content_for :header_tags do %>
   <%= javascript_include_tag "cpm_reports.js", :plugin => 'redmine_cpm' %>
+  <%= stylesheet_link_tag "cpm_show.css", :plugin => 'redmine_cpm' %>
 <% end %>
 
 <h2><%=l(:"cpm.title_capacity_reports")%></h2>
-<%= form_tag("/cpm_reports/reports", method: :get) do |f| %>
+<%= form_tag("/cpm_reports/index", method: :get) do |f| %>
 	<div>
 		<%= label_tag 'report_type', l(:"cpm.label_report_type") %>
-		<% if @report.present? %>
-			<%= select_tag 'report_type', options_for_select(@report_types, @report[:name]) %>
-		<% else %>
-			<%= select_tag 'report_type', options_for_select(@report_types) %>
-		<% end %>
+		<%= select_tag 'report_type', options_for_select(@report_types, @report.present? ? @report[:type] : nil) %>
 	</div>
 	<br>
 	<div id="report_options_div">
-		<% if @report.present? %>
-			<%= render :partial => @report[:partial_options] %>
-		<% end %>
+		<%= render :partial => 'cpm_reports/filters/'+@report[:type] if @report.present?%>
 	</div>
 	<div>
 		<%= submit_tag l(:"button_submit") %>
@@ -24,9 +19,7 @@
 <% end %>
 
 <div id="capacity_report">
-	<% if @report.present? %>
-		<%= render :partial => @report[:partial_result] %>
-	<% end %>
+	<%= render :partial => 'cpm_reports/report' if @report.present?%>
 </div>
 
 <% if @report.present? %>

@@ -3,69 +3,66 @@ class CpmReportsController < ApplicationController
 
   #before_filter :authorize_global, :only => [:show]
   before_filter :set_menu_item
-
-  helper :cpm_app
+  menu_item :reports, :only => :index
 
   # Main view for reports generation
-  def reports
+  def index
     # Load report types
-    @report_types = [""]
+    @report_types = ['']+CPM::Reports::DEFAULT_REPORTS.map{|r| [l(:"cpm.label_#{r}"), r]}
+    
+    if params[:report_type].present? and CPM::Reports::DEFAULT_REPORTS.include?(params[:report_type])
+      @report = {
+        :type => params[:report_type],
+        :selected => params[params[:report_type]]
+      }
 
-    if Setting.plugin_redmine_cpm['project_manager_role'].present?
-      @report_types << [l(:"cpm.label_project_manager_role"), "project_manager"]
-      @report_types << [l(:"label_user"), "user"]
-    end
-
-    if params[:report_type].present?
-      @report = {}
-      @report[:name] = params[:report_type]
-      @report[:partial_result] = 'cpm_reports/reports/'+params[:report_type]
-      @report[:partial_options] = 'cpm_reports/report_options/'+params[:report_type]
-      @report[:options] = params[:report_options]
-
-      # Get data for report generation
-      @result = CPM::Reports.get_report(@report[:name], @report)
+      @result = CPM::Reports.generate_report(@report)
 
       # If it's an export request, load export headers
       if params[:format].present?
         @format = params[:format]
-        export
-      # If it isn't an export request, load options data
+        export  
+      # If it isn't an export request, load selected filter options
       else
-        eval("get_report_options_"+@report[:name])
+        eval("get_filter_"+@report[:type])
       end
     end
   end
 
-  # Show project manager reports options data
-  def get_report_options_project_manager
-    project_manager_role = Setting.plugin_redmine_cpm['project_manager_role'];
+  # Show user reports options data
+  def get_filter_users
+    @users_selected = []
+    if params['users'].present?
+      @users_selected = params['users']
+    end
 
-    @report_options = User.get_by_role(project_manager_role).collect{|u| [u.login, (u.id).to_s]}.sort
+    @users_options = User.allowed.sort_by{|u| u.login}.collect{|u| [u.login, (u.id).to_s]}
 
-    # If it's an AJAX request, send options partial
     if request.xhr?
-      render :json => { :options => render_to_string(:partial => 'cpm_reports/report_options/project_manager', :layout => false )}
+      render :json => { :filter => render_to_string(:partial => 'cpm_reports/filters/users', :layout => false) }
     end
   end
 
-  # Show user reports options data
-  def get_report_options_user
-    @report_options = User.allowed.collect{|u| [u.login, (u.id).to_s]}.sort
+  def get_filter_projects
+    @projects_selected = []
+    if params['projects'].present?
+      @projects_selected = params['projects']
+    end
 
-    # If it's an AJAX request, send options partial
+    @projects_options = Project.allowed.sort_by{|p| p.name}.collect{|p| [p.name, (p.id).to_s]}
+
     if request.xhr?
-      render :json => { :options => render_to_string(:partial => 'cpm_reports/report_options/user', :layout => false )}
+      render :json => { :filter => render_to_string(:partial => 'cpm_reports/filters/projects', :layout => false) }
     end
   end
 
   # Add headers to generate the file to export with the proper file extension
   def export
     headers['Content-Type'] = "text/plain" #"application/vnd.ms-excel"
-    headers['Content-Disposition'] = 'attachment; filename="'+@report[:name]+'_planning_'+Date.today.strftime("%Y%m%d")+'.'+@format+'"'
+    headers['Content-Disposition'] = 'attachment; filename="'+@report[:type]+'_planning_'+Date.today.strftime("%Y%m%d")+'.'+@format+'"'
     headers['Cache-Control'] = ''
 
-    render 'cpm_reports/reports/_'+@report[:name], :layout => false
+    render 'cpm_reports/_report', :layout => false
   end
 
   private

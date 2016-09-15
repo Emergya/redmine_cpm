@@ -82,7 +82,7 @@ es:
     label_month_n: "Mes %{n}"
 
     msg_projects_not_found: "No se ha encontrado ningún proyecto con los requisitos especificados. Se mostrarán los resultados para todos los proyectos."
-    msg_capacity_higher_than_100: "La capacidad del usuario a superado el 100%"
+    msg_capacity_higher_than_100: "La capacidad del usuario ha superado el 100%"
     msg_save_success: "Se ha guardado con exito"
     msg_edit_success: "Se ha modificado con exito"
     msg_delete_success: "Se ha eliminado con exito"
