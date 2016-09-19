@@ -37,7 +37,7 @@
 					capacity = @capacities[user.id][i]['value'].to_i
 					tooltip = @capacities[user.id][i]['tooltip']
 					%>
-					<td onclick="edit_capacities('<%=user.id%>','<%=get_from_date(@time_unit,i)%>','<%=get_to_date(@time_unit,i)%>',<%=@projects_params.to_json%>);" class="edit_user_capacities <%='alert' if capacity > 100 %> <%=@time_unit%> <%= 'weekend' if is_friday(@time_unit,i) %>" title="<%=tooltip%>" value=<%=capacity%>>
+					<td onclick="edit_capacities('<%=user.id%>','<%=user.login%>','<%=get_from_date(@time_unit,i)%>','<%=get_to_date(@time_unit,i)%>',<%=@projects_params.to_json%>);" class="edit_user_capacities <%='alert' if capacity > 100 %> <%=@time_unit%> <%= 'weekend' if is_friday(@time_unit,i) %>" title="<%=tooltip%>" value=<%=capacity%>>
 						<%= capacity %>
 					</td>
 				<% end %>
