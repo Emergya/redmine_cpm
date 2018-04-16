@@ -91,10 +91,10 @@ module CPM
       if projects.present? and !filters[:users].present? and !filters[:groups].present? and !filters[:knowledges].present?
         # get users who are project members
         members = User.allowed(filters['ignore_black_lists'].present?).joins(:members).where("members.project_id IN (?)", projects.map(&:id))
-        # get users who have time entries in projects
-        time_entries = User.allowed(filters['ignore_black_lists'].present?).joins('LEFT JOIN time_entries ON time_entries.user_id = users.id').where("time_entries.project_id IN (?)", projects.map(&:id))
-        # get users who have capacity registered in projects
-        capacity = projects.map{|p| p.capacities.map(&:user)}.flatten
+        # get users who have time entries in projects in the future
+        time_entries = User.allowed(filters['ignore_black_lists'].present?).joins('LEFT JOIN time_entries ON time_entries.user_id = users.id').where("time_entries.project_id IN (?) AND spent_on >= ?", projects.map(&:id), Date.today)
+        # get users who have capacity registered in projects in the future
+        capacity = projects.map{|p| p.capacities.where("to_date >= ?", Date.today).map(&:user)}.flatten
 
         users = (members + time_entries + capacity).uniq.map(&:id)
       end
